@@ -24,8 +24,11 @@ jobs:
           tar -xJf timer-source.tar.xz
       - name: Install Android SDK 35
         run: |
-          yes | sdkmanager --licenses >/dev/null || true
-          sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+          SDK="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          MANAGER="$(find "$SDK/cmdline-tools" -type f -name sdkmanager | head -n1)"
+          test -n "$MANAGER"
+          yes | "$MANAGER" --sdk_root="$SDK" --licenses >/dev/null || true
+          "$MANAGER" --sdk_root="$SDK" 'platforms;android-35' 'build-tools;35.0.0'
       - name: Build Debug APK
         run: cd saaweyefsel-android && gradle --no-daemon :app:assembleDebug
       - uses: actions/upload-artifact@v4
